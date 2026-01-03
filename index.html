@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>デザイン書道 - Web書道アプリ</title>
+
+    <!-- Google Analytics (GA4) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-QPL3L800MT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-QPL3L800MT');
+    </script>
     <meta name="description" content="Webでデザイン書道を手軽に楽しめるアプリ。筆圧対応でリアルな筆運びを再現。マウス・タッチ・ペン対応。" />
 
     <!-- Favicon -->
@@ -49,5 +58,8 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Cloudflare Web Analytics -->
+    <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "8f998985e2824cb49ccc83adc48b03d2"}'></script>
   </body>
 </html>
