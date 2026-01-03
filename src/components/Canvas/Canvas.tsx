@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useState, useCallback } from 'react'
+import { useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useState } from 'react'
 import { CanvasRenderer } from './CanvasRenderer'
 import { BrushEngine } from '../../core/brush'
 import { useCanvasStore } from '../../stores/canvasStore'
