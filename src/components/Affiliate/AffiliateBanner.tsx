@@ -43,7 +43,8 @@ export function AffiliateBanner({
     const loadScript = async () => {
       if (!window.NeuvecomAffiliateBanner) {
         const script = document.createElement('script')
-        script.src = '/Design-sho-do/lib/neuvecom-common/js/affiliate-lite.js'
+        // Viteのbase設定を使用（import.meta.env.BASE_URL）
+        script.src = `${import.meta.env.BASE_URL}lib/neuvecom-common/js/affiliate-lite.js`
         script.async = true
 
         await new Promise<void>((resolve, reject) => {
