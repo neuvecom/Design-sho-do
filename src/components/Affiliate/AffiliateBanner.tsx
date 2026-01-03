@@ -1,78 +1,41 @@
-import { useEffect, useRef } from 'react'
-import '../../lib/neuvecom-common/css/affiliate.css'
+import { useState, useEffect } from 'react'
 
-// グローバル型定義
-declare global {
-  interface Window {
-    NeuvecomAffiliateBanner: new (config: AffiliateBannerConfig) => AffiliateBannerInstance
-  }
-}
-
-interface AffiliateBannerConfig {
-  sid: string
-  configPath?: string
-  storageKeyPrefix?: string
-  fallbackImagesPath?: string
-}
-
-interface AffiliateBannerInstance {
-  render: (container: HTMLElement, section?: string) => void
-  destroy: () => void
-}
+const BANNER_IMAGES = [
+  '/Design-sho-do/img/banners/nc-block01.png',
+  '/Design-sho-do/img/banners/nc-block02.png',
+  '/Design-sho-do/img/banners/nc-block03.png',
+  '/Design-sho-do/img/banners/nc-block04.png',
+]
 
 interface AffiliateBannerProps {
-  sid: string
+  sid?: string
   section?: string
-  configPath?: string
-  storageKeyPrefix?: string
-  fallbackImagesPath?: string
 }
 
-export function AffiliateBanner({
-  sid,
-  section = 'header',
-  configPath = '/data/affiliates.yaml',
-  storageKeyPrefix = 'design-shodo',
-  fallbackImagesPath = '/img/',
-}: AffiliateBannerProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const bannerRef = useRef<AffiliateBannerInstance | null>(null)
+export function AffiliateBanner({ sid: _sid, section: _section }: AffiliateBannerProps) {
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   useEffect(() => {
-    // affiliate-lite.jsを動的に読み込む
-    const loadScript = async () => {
-      if (!window.NeuvecomAffiliateBanner) {
-        const script = document.createElement('script')
-        script.src = '/lib/neuvecom-common/js/affiliate-lite.js'
-        script.async = true
+    // ランダムな初期インデックス
+    setCurrentIndex(Math.floor(Math.random() * BANNER_IMAGES.length))
+  }, [])
 
-        await new Promise<void>((resolve, reject) => {
-          script.onload = () => resolve()
-          script.onerror = () => reject(new Error('Failed to load affiliate script'))
-          document.head.appendChild(script)
-        })
-      }
+  // 10秒ごとに画像を切り替え
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % BANNER_IMAGES.length)
+    }, 10000)
+    return () => clearInterval(interval)
+  }, [])
 
-      if (containerRef.current && window.NeuvecomAffiliateBanner) {
-        bannerRef.current = new window.NeuvecomAffiliateBanner({
-          sid,
-          configPath,
-          storageKeyPrefix,
-          fallbackImagesPath,
-        })
-        bannerRef.current.render(containerRef.current, section)
-      }
-    }
-
-    loadScript().catch(console.error)
-
-    return () => {
-      if (bannerRef.current) {
-        bannerRef.current.destroy()
-        bannerRef.current = null
-      }
-    }
-  }, [sid, section, configPath, storageKeyPrefix, fallbackImagesPath])
-
-  return <div ref={containerRef} className="affiliate-banner-area" />
+  return (
+    <div className="flex justify-center">
+      <img
+        src={BANNER_IMAGES[currentIndex]}
+        alt="広告バナー"
+        className="max-w-full h-auto rounded transition-opacity duration-500"
+        style={{ maxHeight: '60px' }}
+      />
+    </div>
+  )
 }
