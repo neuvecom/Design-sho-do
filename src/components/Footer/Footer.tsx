@@ -14,16 +14,16 @@ export function Footer() {
       </div>
 
       {/* ページリンク */}
-      <nav className="flex gap-6 text-sm">
+      <nav className="flex gap-4 text-sm">
         <Link
           to="/guide"
-          className="text-stone-700 hover:text-stone-900 transition-colors"
+          className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg border border-stone-300 hover:bg-stone-200 hover:border-stone-400 transition-colors"
         >
           使い方
         </Link>
         <Link
           to="/about"
-          className="text-stone-700 hover:text-stone-900 transition-colors"
+          className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg border border-stone-300 hover:bg-stone-200 hover:border-stone-400 transition-colors"
         >
           デザイン書道のすすめ
         </Link>
