@@ -110,13 +110,13 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = 'design-shodo.png'
+      link.download = 'bokusai-bokudo.png'
       link.click()
       URL.revokeObjectURL(url)
 
       // Xの投稿画面を開く
       const shareUrl = 'https://neuvecom.github.io/Design-sho-do/'
-      const text = encodeURIComponent(`デザイン書道で作品を作りました！\n${shareUrl}\n#デザイン書道`)
+      const text = encodeURIComponent(`墨彩的墨道で作品を作りました！\n${shareUrl}\n#墨彩的墨道`)
       const xUrl = `https://twitter.com/intent/tweet?text=${text}`
       window.open(xUrl, '_blank', 'noopener,noreferrer')
 

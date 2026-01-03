@@ -37,8 +37,8 @@ export function HomePage() {
         {/* ヘッダー */}
         <header className="text-center mb-6">
           <div className="inline-block">
-            <h1 className="text-4xl font-bold tracking-wider text-stone-800 mb-1" style={{ fontFamily: '"Kouzan Mouhitu", serif' }}>
-              デザイン書道
+            <h1 className="text-6xl font-black tracking-wider text-stone-800 mb-1" style={{ fontFamily: '"Kouzan Mouhitu", serif' }}>
+              墨彩的墨道
             </h1>
             <div className="h-px bg-gradient-to-r from-transparent via-stone-400 to-transparent" />
           </div>
