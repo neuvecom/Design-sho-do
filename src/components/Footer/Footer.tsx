@@ -14,7 +14,13 @@ export function Footer() {
       </div>
 
       {/* ページリンク */}
-      <nav className="flex gap-4 text-sm">
+      <nav className="flex flex-wrap justify-center gap-3 text-sm">
+        <Link
+          to="/info"
+          className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg border border-stone-300 hover:bg-stone-200 hover:border-stone-400 transition-colors"
+        >
+          お知らせ
+        </Link>
         <Link
           to="/guide"
           className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg border border-stone-300 hover:bg-stone-200 hover:border-stone-400 transition-colors"
@@ -25,7 +31,13 @@ export function Footer() {
           to="/about"
           className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg border border-stone-300 hover:bg-stone-200 hover:border-stone-400 transition-colors"
         >
-          墨道のすすめ
+          墨道について
+        </Link>
+        <Link
+          to="/item"
+          className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg border border-stone-300 hover:bg-stone-200 hover:border-stone-400 transition-colors"
+        >
+          おすすめの道具
         </Link>
       </nav>
 
