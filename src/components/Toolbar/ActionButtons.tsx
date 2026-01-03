@@ -36,6 +36,16 @@ const DownloadIcon = () => (
   </svg>
 )
 
+const GridIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18" />
+    <path d="M3 15h18" />
+    <path d="M9 3v18" />
+    <path d="M15 3v18" />
+  </svg>
+)
+
 interface ToastState {
   message: string
   type: 'success' | 'error' | 'info'
@@ -46,7 +56,7 @@ interface ActionButtonsProps {
 }
 
 export function ActionButtons({ canvasRef }: ActionButtonsProps) {
-  const { undo, redo, clearCanvas, history, historyIndex } = useCanvasStore()
+  const { undo, redo, clearCanvas, history, historyIndex, showGrid, toggleGrid } = useCanvasStore()
   const [toast, setToast] = useState<ToastState | null>(null)
 
   const canUndo = historyIndex > 0
@@ -82,13 +92,13 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
 
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex gap-1">
         <Button
           variant="ghost"
           size="sm"
           onClick={undo}
           disabled={!canUndo}
-          title="元に戻す (Ctrl+Z)"
+          title="元に戻す (⌘Z)"
         >
           <UndoIcon />
         </Button>
@@ -97,11 +107,20 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
           size="sm"
           onClick={redo}
           disabled={!canRedo}
-          title="やり直し (Ctrl+Y)"
+          title="やり直し (⌘Y)"
         >
           <RedoIcon />
         </Button>
-        <div className="w-px bg-gray-200 mx-1" />
+        <div className="w-px h-5 bg-stone-200 mx-1" />
+        <Button
+          variant={showGrid ? "primary" : "ghost"}
+          size="sm"
+          onClick={toggleGrid}
+          title="8x8グリッド表示"
+        >
+          <GridIcon />
+        </Button>
+        <div className="w-px h-5 bg-stone-200 mx-1" />
         <Button
           variant="ghost"
           size="sm"
@@ -111,10 +130,10 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
           <TrashIcon />
         </Button>
         <Button
-          variant="primary"
+          variant="ghost"
           size="sm"
           onClick={handleDownload}
-          title="画像を保存"
+          title="画像をダウンロード"
         >
           <DownloadIcon />
         </Button>

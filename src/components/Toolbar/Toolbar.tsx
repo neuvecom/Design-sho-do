@@ -1,23 +1,30 @@
 import { BrushSettings } from './BrushSettings'
 import { ColorPicker } from './ColorPicker'
-import { ActionButtons } from './ActionButtons'
-import type { CanvasHandle } from '../Canvas'
+import { TemplateSettings } from './TemplateSettings'
 
-interface ToolbarProps {
-  canvasRef?: React.RefObject<CanvasHandle | null>
-}
-
-export function Toolbar({ canvasRef }: ToolbarProps) {
+export function Toolbar() {
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-800">ツール</h2>
-        <ActionButtons canvasRef={canvasRef} />
-      </div>
-      <div className="h-px bg-gray-200" />
-      <BrushSettings />
-      <div className="h-px bg-gray-200" />
-      <ColorPicker />
+    <div className="bg-gradient-to-b from-white to-stone-50/80 rounded-xl shadow-lg shadow-stone-200/50 border border-stone-200/60 py-5 px-6 flex flex-col gap-5">
+      {/* 筆の設定 */}
+      <section>
+        <BrushSettings />
+      </section>
+
+      {/* 区切り線 */}
+      <div className="h-px bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
+
+      {/* 墨色選択 */}
+      <section>
+        <ColorPicker />
+      </section>
+
+      {/* 区切り線 */}
+      <div className="h-px bg-gradient-to-r from-transparent via-stone-200 to-transparent" />
+
+      {/* お手本設定 */}
+      <section>
+        <TemplateSettings />
+      </section>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { Application, Graphics, Container, RenderTexture, Sprite } from 'pixi.js'
 import type { Stroke, BrushPoint } from '../../types'
 import { CalligraphyBrush } from '../../core/brush'
+import type { BrushType } from '../../core/brush/types'
 import { lerp } from '../../utils/math'
 
 export class CanvasRenderer {
@@ -126,7 +127,8 @@ export class CanvasRenderer {
     const tempGraphics = new Graphics()
 
     for (const stroke of strokes) {
-      const brush = new CalligraphyBrush(stroke.size, stroke.color)
+      const brushType = (stroke.brushType || 'standard') as BrushType
+      const brush = new CalligraphyBrush(stroke.size, stroke.color, brushType)
       // 確定済みストロークには入り抜き補正を適用
       const renderedPoints = brush.processFinishedStroke(stroke.points)
       const color = parseInt(stroke.color.replace('#', ''), 16)

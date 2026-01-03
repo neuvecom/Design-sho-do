@@ -1,10 +1,9 @@
 import type { BrushPoint } from '../../types'
-import type { BrushConfig, RenderedPoint } from './types'
-import { DEFAULT_BRUSH_CONFIG } from './types'
+import type { BrushConfig, RenderedPoint, BrushType } from './types'
+import { getBrushPreset } from './types'
 import {
   pressureCurve,
   velocity,
-  calculateOpacity,
   velocityToPressure,
   calculateTaperFactor,
   lerp,
@@ -13,9 +12,10 @@ import {
 export class CalligraphyBrush {
   private config: BrushConfig
 
-  constructor(baseSize: number, color: string) {
+  constructor(baseSize: number, color: string, brushType: BrushType = 'standard') {
+    const preset = getBrushPreset(brushType)
     this.config = {
-      ...DEFAULT_BRUSH_CONFIG,
+      ...preset.config,
       baseSize,
       color,
     }
@@ -26,13 +26,25 @@ export class CalligraphyBrush {
     this.config = { ...this.config, ...updates }
   }
 
+  // 筆の種類を変更
+  setBrushType(type: BrushType): void {
+    const preset = getBrushPreset(type)
+    this.config = {
+      ...this.config,
+      ...preset.config,
+    }
+  }
+
   // 筆圧から線幅を計算
   calculateWidth(pressure: number): number {
-    const { baseSize, minWidth, maxWidth } = this.config
-    const curve = pressureCurve(pressure)
+    const { baseSize, minWidth, maxWidth, pressureSensitivity } = this.config
+    // 筆圧感度を適用
+    const adjustedPressure = lerp(0.5, pressure, pressureSensitivity)
+    const curve = pressureCurve(adjustedPressure)
     const widthRatio = lerp(minWidth, maxWidth, curve)
     return baseSize * widthRatio
   }
+
 
   // 単一ポイントの筆圧を計算（リアルタイム描画用）
   private calculatePressureForPoint(
@@ -54,54 +66,18 @@ export class CalligraphyBrush {
     return simulatedPressure
   }
 
-  // ストローク全体を処理（リアルタイム描画用 - 入り抜きなし）
+  // ストローク全体を処理（リアルタイム描画用）
   processStroke(points: BrushPoint[]): RenderedPoint[] {
-    if (points.length === 0) return []
-
-    const rendered: RenderedPoint[] = []
-    let lastPressure = 0.5
-
-    for (let i = 0; i < points.length; i++) {
-      const point = points[i]
-      const prevPoint = i > 0 ? points[i - 1] : undefined
-
-      // 速度ベースの疑似筆圧を計算
-      const simulatedPressure = this.calculatePressureForPoint(point, prevPoint, lastPressure)
-      lastPressure = simulatedPressure
-
-      // 入りの補正のみ適用（描画中は抜きの位置が不明なため）
-      let finalPressure = simulatedPressure
-      if (i < 5 && i > 0) {
-        // 最初の5ポイントで入りを表現（i=0は除外して最低限の線幅を確保）
-        const taperIn = i / 5
-        finalPressure *= 0.3 + taperIn * 0.7 * (2 - taperIn) // 最低30%を確保
-      } else if (i === 0) {
-        finalPressure *= 0.3 // 最初のポイントは30%の太さ
-      }
-
-      // 線幅を計算
-      const width = this.calculateWidth(finalPressure)
-
-      // 透明度（かすれ）を計算
-      let opacity = 1
-      if (prevPoint) {
-        const vel = velocity(prevPoint, point)
-        opacity = calculateOpacity(vel)
-      }
-
-      rendered.push({
-        ...point,
-        pressure: finalPressure,
-        width,
-        opacity,
-      })
-    }
-
-    return this.smoothPoints(rendered)
+    return this.processPoints(points, false)
   }
 
-  // 確定済みストロークを処理（入り抜き補正あり）
+  // 確定済みストロークを処理
   processFinishedStroke(points: BrushPoint[]): RenderedPoint[] {
+    return this.processPoints(points, true)
+  }
+
+  // 共通のポイント処理
+  private processPoints(points: BrushPoint[], isFinished: boolean): RenderedPoint[] {
     if (points.length === 0) return []
 
     const rendered: RenderedPoint[] = []
@@ -115,18 +91,23 @@ export class CalligraphyBrush {
       const simulatedPressure = this.calculatePressureForPoint(point, prevPoint, lastPressure)
       lastPressure = simulatedPressure
 
-      // 入り抜き補正を適用（確定時のみ）
+      // 入り抜き補正を適用
       const taperFactor = calculateTaperFactor(i, points.length)
-      const finalPressure = simulatedPressure * taperFactor
+      // 描画中は抜きを控えめに（まだストロークが続く可能性があるため）
+      // 差を小さくするため、描画中も0.85以上に制限（以前は0.7）
+      const adjustedTaper = isFinished ? taperFactor : Math.max(taperFactor, 0.85)
+      const finalPressure = simulatedPressure * adjustedTaper
 
       // 線幅を計算
       const width = this.calculateWidth(finalPressure)
 
-      // 透明度（かすれ）を計算
-      let opacity = 1
+      // 透明度（かすれ）を計算 - ブラシ設定を反映
+      let opacity = this.config.opacityBase
       if (prevPoint) {
         const vel = velocity(prevPoint, point)
-        opacity = calculateOpacity(vel)
+        // opacitySpeedを使って速度に応じた透明度変化を計算
+        const velocityEffect = vel * this.config.opacitySpeed * 10 // 効果を強める
+        opacity = Math.max(0.15, this.config.opacityBase - velocityEffect)
       }
 
       rendered.push({

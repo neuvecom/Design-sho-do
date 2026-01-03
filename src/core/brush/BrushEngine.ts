@@ -1,14 +1,17 @@
 import type { BrushPoint, Stroke } from '../../types'
 import { CalligraphyBrush } from './CalligraphyBrush'
+import type { BrushType } from './types'
 import { generateId } from '../../utils/math'
 
 export class BrushEngine {
   private brush: CalligraphyBrush
   private currentPoints: BrushPoint[] = []
   private isDrawing = false
+  private currentBrushType: BrushType = 'standard'
 
-  constructor(size: number, color: string) {
-    this.brush = new CalligraphyBrush(size, color)
+  constructor(size: number, color: string, brushType: BrushType = 'standard') {
+    this.brush = new CalligraphyBrush(size, color, brushType)
+    this.currentBrushType = brushType
   }
 
   // ブラシサイズを更新
@@ -19,6 +22,12 @@ export class BrushEngine {
   // ブラシ色を更新
   setColor(color: string): void {
     this.brush.updateConfig({ color })
+  }
+
+  // 筆の種類を更新
+  setBrushType(type: BrushType): void {
+    this.brush.setBrushType(type)
+    this.currentBrushType = type
   }
 
   // ストローク開始
@@ -47,6 +56,7 @@ export class BrushEngine {
       points: [...this.currentPoints],
       color: this.brush.color,
       size: this.brush.baseSize,
+      brushType: this.currentBrushType,
     }
 
     this.currentPoints = []

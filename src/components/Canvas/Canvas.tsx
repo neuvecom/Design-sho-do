@@ -2,6 +2,7 @@ import { useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useState }
 import { CanvasRenderer } from './CanvasRenderer'
 import { BrushEngine } from '../../core/brush'
 import { useCanvasStore } from '../../stores/canvasStore'
+import { useTemplateStore } from '../../stores/templateStore'
 import { createBrushCursor } from '../../utils/cursor'
 import type { BrushPoint } from '../../types'
 
@@ -16,7 +17,46 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
   const isDrawingRef = useRef(false)
   const [isReady, setIsReady] = useState(false)
 
-  const { brushSize, brushColor, canvasSize, strokes, addStroke } = useCanvasStore()
+  const { brushSize, brushColor, brushType, canvasSize, strokes, addStroke, showGrid } = useCanvasStore()
+  const { isTemplateMode, templateImage, templateChar, templateOpacity } = useTemplateStore()
+
+  // 8x8グリッドの線を生成
+  const gridLines = useMemo(() => {
+    if (!showGrid) return null
+    const lines = []
+    const cellWidth = canvasSize.width / 8
+    const cellHeight = canvasSize.height / 8
+
+    // 縦線
+    for (let i = 1; i < 8; i++) {
+      lines.push(
+        <line
+          key={`v${i}`}
+          x1={cellWidth * i}
+          y1={0}
+          x2={cellWidth * i}
+          y2={canvasSize.height}
+          stroke="#d4c4b0"
+          strokeWidth={1}
+        />
+      )
+    }
+    // 横線
+    for (let i = 1; i < 8; i++) {
+      lines.push(
+        <line
+          key={`h${i}`}
+          x1={0}
+          y1={cellHeight * i}
+          x2={canvasSize.width}
+          y2={cellHeight * i}
+          stroke="#d4c4b0"
+          strokeWidth={1}
+        />
+      )
+    }
+    return lines
+  }, [showGrid, canvasSize.width, canvasSize.height])
 
   // ブラシサイズと色に応じたカスタムカーソル
   const cursorStyle = useMemo(
@@ -32,12 +72,13 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
   // ブラシエンジンの初期化・更新
   useEffect(() => {
     if (!brushEngineRef.current) {
-      brushEngineRef.current = new BrushEngine(brushSize, brushColor)
+      brushEngineRef.current = new BrushEngine(brushSize, brushColor, brushType)
     } else {
       brushEngineRef.current.setSize(brushSize)
       brushEngineRef.current.setColor(brushColor)
+      brushEngineRef.current.setBrushType(brushType)
     }
-  }, [brushSize, brushColor])
+  }, [brushSize, brushColor, brushType])
 
   // レンダラーの初期化
   useEffect(() => {
@@ -142,6 +183,46 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
-    />
+    >
+      {/* お手本画像（背景として表示） */}
+      {isTemplateMode && templateImage && (
+        <img
+          src={templateImage}
+          alt="お手本"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none select-none"
+          style={{
+            opacity: templateOpacity / 100,
+            zIndex: 0,
+          }}
+          draggable={false}
+        />
+      )}
+      {/* お手本文字（毛筆フォントで表示） */}
+      {isTemplateMode && templateChar && (
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+          style={{
+            fontFamily: '"Kouzan Mouhitu", serif',
+            fontSize: `${Math.min(canvasSize.width, canvasSize.height) * 0.7}px`,
+            lineHeight: 1,
+            color: '#1a1a1a',
+            opacity: templateOpacity / 100,
+            zIndex: 0,
+          }}
+        >
+          {templateChar}
+        </div>
+      )}
+      {/* 8x8グリッド */}
+      {showGrid && (
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ zIndex: 1 }}
+          viewBox={`0 0 ${canvasSize.width} ${canvasSize.height}`}
+        >
+          {gridLines}
+        </svg>
+      )}
+    </div>
   )
 })

@@ -1,0 +1,1 @@
+export { AffiliateBanner } from './AffiliateBanner'
