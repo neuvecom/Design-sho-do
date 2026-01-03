@@ -4,15 +4,6 @@ import { AffiliateBanner } from '../Affiliate'
 export function Footer() {
   return (
     <footer className="mt-10 flex flex-col items-center gap-6">
-      {/* 操作説明 */}
-      <div className="inline-flex items-center gap-3 text-xs text-stone-700">
-        <span className="w-8 h-px bg-stone-400" />
-        <span>マウス・タッチ・ペン対応</span>
-        <span className="text-stone-400">|</span>
-        <span>⌘Z 戻る / ⌘Y やり直し</span>
-        <span className="w-8 h-px bg-stone-400" />
-      </div>
-
       {/* ページリンク */}
       <nav className="flex flex-wrap justify-center gap-3 text-sm">
         <Link
