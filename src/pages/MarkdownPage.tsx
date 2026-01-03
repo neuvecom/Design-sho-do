@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import { Footer } from '../components/Footer'
 import { SideMenu, type MenuItem } from '../components/Layout'
@@ -18,20 +18,26 @@ const BackIcon = () => (
 // サイドメニューの項目定義
 const menuItems: MenuItem[] = [
   { path: '/', label: 'ホーム' },
+  { path: '/info', label: 'お知らせ' },
   { path: '/guide', label: '使い方' },
-  { path: '/about', label: '墨道のすすめ' },
+  { path: '/about', label: '墨道について' },
+  { path: '/item', label: 'おすすめの道具' },
 ]
 
 export function MarkdownPage({ contentPath }: MarkdownPageProps) {
+  const { slug } = useParams<{ slug?: string }>()
   const [content, setContent] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // slugがある場合はディレクトリ + slug.md、ない場合はそのままのパス
+  const fullPath = slug ? `${contentPath}/${slug}.md` : contentPath
 
   useEffect(() => {
     setLoading(true)
     setError(null)
 
-    fetch(contentPath)
+    fetch(fullPath)
       .then((response) => {
         if (!response.ok) {
           throw new Error('コンテンツの読み込みに失敗しました')
@@ -46,7 +52,7 @@ export function MarkdownPage({ contentPath }: MarkdownPageProps) {
         setError(err.message)
         setLoading(false)
       })
-  }, [contentPath])
+  }, [fullPath])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-100 via-stone-50 to-amber-50/30 py-10 px-4">

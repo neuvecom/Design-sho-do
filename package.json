@@ -6,7 +6,8 @@
   "description": "Webでデザイン書道を手軽に楽しめるアプリ",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/generate-content-index.js && tsc -b && vite build",
+    "build:index": "node scripts/generate-content-index.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },

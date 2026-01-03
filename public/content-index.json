@@ -1,0 +1,20 @@
+{
+  "guide": [
+    {
+      "slug": "basic",
+      "title": "使い方ガイド"
+    }
+  ],
+  "about": [
+    {
+      "slug": "introduction",
+      "title": "墨道のすすめ"
+    }
+  ],
+  "item": [
+    {
+      "slug": "brushes",
+      "title": "おすすめの筆"
+    }
+  ]
+}
