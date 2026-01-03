@@ -47,7 +47,7 @@ export function SideMenu({ items }: SideMenuProps) {
     <nav className="w-56 shrink-0">
       <div className="sticky top-10">
         <div className="bg-white/80 rounded-xl shadow-lg shadow-stone-200/50 border border-stone-200/60 p-4">
-          <h2 className="text-sm font-bold text-stone-600 mb-3 px-2">メニュー</h2>
+          <h2 className="text-sm font-bold text-stone-600 mb-3 px-2">ドキュメント</h2>
           <ul className="space-y-1">
             {items.map((item) => {
               const isActive = location.pathname === item.path

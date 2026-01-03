@@ -17,7 +17,7 @@ const BackIcon = () => (
 
 // サイドメニューの項目定義
 const menuItems: MenuItem[] = [
-  { path: '/', label: 'ホーム' },
+  { path: '/', label: 'アプリ' },
   { path: '/info', label: 'お知らせ' },
   { path: '/guide', label: '使い方' },
   { path: '/about', label: '墨道について' },
