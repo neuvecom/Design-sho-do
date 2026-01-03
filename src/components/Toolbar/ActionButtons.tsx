@@ -36,6 +36,12 @@ const DownloadIcon = () => (
   </svg>
 )
 
+const XIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+)
+
 const GridIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
     <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -83,10 +89,41 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
       link.download = filename
       link.click()
       URL.revokeObjectURL(url)
-      showToast(`画像を保存しました: ${filename}`, 'success')
+      showToast(`画像を保存しました`, 'success')
     } catch (error) {
       console.error('Failed to export image:', error)
       showToast('画像の保存に失敗しました', 'error')
+    }
+  }, [canvasRef])
+
+  // Xで共有（画像ダウンロード + X投稿画面）
+  const handleShareToX = useCallback(async () => {
+    const renderer = canvasRef?.current?.getRenderer()
+    if (!renderer) {
+      showToast('キャンバスが初期化されていません', 'error')
+      return
+    }
+
+    try {
+      // 画像をダウンロード
+      const blob = await renderer.exportImage()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'design-shodo.png'
+      link.click()
+      URL.revokeObjectURL(url)
+
+      // Xの投稿画面を開く
+      const shareUrl = 'https://neuvecom.github.io/Design-sho-do/'
+      const text = encodeURIComponent(`デザイン書道で作品を作りました！\n${shareUrl}\n#デザイン書道`)
+      const xUrl = `https://twitter.com/intent/tweet?text=${text}`
+      window.open(xUrl, '_blank', 'noopener,noreferrer')
+
+      showToast('画像をダウンロードしました。Xの投稿画面で添付してください', 'info')
+    } catch (error) {
+      console.error('Failed to share:', error)
+      showToast('共有に失敗しました', 'error')
     }
   }, [canvasRef])
 
@@ -136,6 +173,14 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
           title="画像をダウンロード"
         >
           <DownloadIcon />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleShareToX}
+          title="Xで共有"
+        >
+          <XIcon />
         </Button>
       </div>
       {toast && (

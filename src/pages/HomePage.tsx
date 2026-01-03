@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { Canvas, type CanvasHandle } from '../components/Canvas'
-import { Toolbar, ActionButtons, ShareButtons } from '../components/Toolbar'
+import { Toolbar, ActionButtons } from '../components/Toolbar'
 import { ArtworkList } from '../components/ArtworkList'
 import { Footer } from '../components/Footer'
 import { useCanvasStore } from '../stores/canvasStore'
@@ -59,7 +59,6 @@ export function HomePage() {
             {/* アクションバー（キャンバス上部） */}
             <div className="bg-gradient-to-r from-white to-stone-50/80 rounded-lg shadow-md shadow-stone-200/50 border border-stone-200/60 py-2 px-4 flex items-center gap-1">
               <ArtworkList canvasRef={canvasRef} />
-              <ShareButtons canvasRef={canvasRef} />
               <ActionButtons canvasRef={canvasRef} />
             </div>
 
