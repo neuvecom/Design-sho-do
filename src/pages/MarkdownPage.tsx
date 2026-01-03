@@ -19,7 +19,7 @@ const BackIcon = () => (
 const menuItems: MenuItem[] = [
   { path: '/', label: 'ホーム' },
   { path: '/guide', label: '使い方' },
-  { path: '/about', label: 'デザイン書道のすすめ' },
+  { path: '/about', label: '墨道のすすめ' },
 ]
 
 export function MarkdownPage({ contentPath }: MarkdownPageProps) {

@@ -25,7 +25,7 @@ export function Footer() {
           to="/about"
           className="px-4 py-2 bg-stone-100 text-stone-700 rounded-lg border border-stone-300 hover:bg-stone-200 hover:border-stone-400 transition-colors"
         >
-          デザイン書道のすすめ
+          墨道のすすめ
         </Link>
       </nav>
 
