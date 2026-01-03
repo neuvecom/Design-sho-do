@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useState } from 'react'
+import { useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useState, useCallback } from 'react'
 import { CanvasRenderer } from './CanvasRenderer'
 import { BrushEngine } from '../../core/brush'
 import { useCanvasStore } from '../../stores/canvasStore'
@@ -19,6 +19,7 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
 
   const { brushSize, brushColor, brushType, canvasSize, strokes, addStroke, showGrid } = useCanvasStore()
   const { isTemplateMode, templateImage, templateChar, templateOpacity } = useTemplateStore()
+  const [isShiftPressed, setIsShiftPressed] = useState(false)
 
   // 8x8グリッドの線を生成
   const gridLines = useMemo(() => {
@@ -63,6 +64,28 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
     () => createBrushCursor(brushSize, brushColor),
     [brushSize, brushColor]
   )
+
+  // Shiftキーの監視
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Shift') {
+        setIsShiftPressed(true)
+      }
+    }
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Shift') {
+        setIsShiftPressed(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [])
 
   // 外部にレンダラーを公開
   useImperativeHandle(ref, () => ({
@@ -222,6 +245,16 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
         >
           {gridLines}
         </svg>
+      )}
+      {/* Shiftキーインジケーター */}
+      {isShiftPressed && (
+        <div
+          className="absolute bottom-2 left-2 px-2 py-1 bg-stone-800/80 text-white text-xs rounded flex items-center gap-1 pointer-events-none"
+          style={{ zIndex: 10 }}
+        >
+          <kbd className="px-1.5 py-0.5 bg-stone-600 rounded text-[10px] font-mono">Shift</kbd>
+          <span>描画モード</span>
+        </div>
       )}
     </div>
   )
