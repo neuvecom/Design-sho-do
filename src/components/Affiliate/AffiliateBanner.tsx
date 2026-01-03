@@ -28,18 +28,16 @@ interface AffiliateBannerProps {
   fallbackImagesPath?: string
 }
 
-const BASE_PATH = import.meta.env.BASE_URL.replace(/\/$/, '')
-
 export function AffiliateBanner({
   sid,
   section = 'header',
-  configPath,
+  configPath = 'data/affiliates.yaml',
   storageKeyPrefix = 'design-shodo',
-  fallbackImagesPath,
+  fallbackImagesPath = 'img/banners/',
 }: AffiliateBannerProps) {
-  // ベースパスを含むデフォルト値
-  const resolvedConfigPath = configPath || `${BASE_PATH}/data/affiliates.yaml`
-  const resolvedFallbackImagesPath = fallbackImagesPath || `${BASE_PATH}/img/banners/`
+  // 相対パスを使用（affiliate-lite.js内部でベースパスが処理される）
+  const resolvedConfigPath = configPath
+  const resolvedFallbackImagesPath = fallbackImagesPath
   const containerRef = useRef<HTMLDivElement>(null)
   const bannerRef = useRef<AffiliateBannerInstance | null>(null)
 
