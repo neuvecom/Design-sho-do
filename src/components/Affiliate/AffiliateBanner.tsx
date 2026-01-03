@@ -28,13 +28,18 @@ interface AffiliateBannerProps {
   fallbackImagesPath?: string
 }
 
+const BASE_PATH = import.meta.env.BASE_URL.replace(/\/$/, '')
+
 export function AffiliateBanner({
   sid,
   section = 'header',
-  configPath = '/data/affiliates.yaml',
+  configPath,
   storageKeyPrefix = 'design-shodo',
-  fallbackImagesPath = '/img/banners/',
+  fallbackImagesPath,
 }: AffiliateBannerProps) {
+  // ベースパスを含むデフォルト値
+  const resolvedConfigPath = configPath || `${BASE_PATH}/data/affiliates.yaml`
+  const resolvedFallbackImagesPath = fallbackImagesPath || `${BASE_PATH}/img/banners/`
   const containerRef = useRef<HTMLDivElement>(null)
   const bannerRef = useRef<AffiliateBannerInstance | null>(null)
 
@@ -57,9 +62,9 @@ export function AffiliateBanner({
       if (containerRef.current && window.NeuvecomAffiliateBanner) {
         bannerRef.current = new window.NeuvecomAffiliateBanner({
           sid,
-          configPath,
+          configPath: resolvedConfigPath,
           storageKeyPrefix,
-          fallbackImagesPath,
+          fallbackImagesPath: resolvedFallbackImagesPath,
         })
         bannerRef.current.render(containerRef.current, section)
       }
@@ -73,7 +78,7 @@ export function AffiliateBanner({
         bannerRef.current = null
       }
     }
-  }, [sid, section, configPath, storageKeyPrefix, fallbackImagesPath])
+  }, [sid, section, resolvedConfigPath, storageKeyPrefix, resolvedFallbackImagesPath])
 
   return <div ref={containerRef} className="affiliate-banner-area" />
 }
