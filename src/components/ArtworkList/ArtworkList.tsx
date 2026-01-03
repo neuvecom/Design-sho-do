@@ -189,7 +189,7 @@ export function ArtworkList({ canvasRef }: ArtworkListProps) {
           variant="ghost"
           size="sm"
           onClick={handleSave}
-          title="保存"
+          title="ローカルに保存"
         >
           <SaveIcon />
         </Button>
@@ -197,7 +197,7 @@ export function ArtworkList({ canvasRef }: ArtworkListProps) {
           variant="ghost"
           size="sm"
           onClick={() => setIsOpen(true)}
-          title="作品一覧"
+          title="ローカルデータ管理"
         >
           <FolderIcon />
         </Button>

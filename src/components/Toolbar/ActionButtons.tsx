@@ -153,7 +153,7 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
           variant={showGrid ? "primary" : "ghost"}
           size="sm"
           onClick={toggleGrid}
-          title="8x8グリッド表示"
+          title="グリッド"
         >
           <GridIcon />
         </Button>
