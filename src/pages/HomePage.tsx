@@ -45,7 +45,7 @@ export function HomePage() {
           </div>
           <p className="text-stone-500 mt-2 text-sm tracking-wide">
             心を込めて、一筆一筆
-            <span className="ml-3 text-xs text-stone-400">v1.0.0</span>
+            <span className="ml-3 text-xs text-stone-400">v1.1.0</span>
           </p>
         </header>
 
