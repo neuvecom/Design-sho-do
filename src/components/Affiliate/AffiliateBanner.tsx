@@ -1,62 +1,78 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
+import '../../lib/neuvecom-common/css/affiliate.css'
 
-const BANNER_DATA = [
-  {
-    image: '/Design-sho-do/img/banners/nc-block01.png',
-    text: '書道の道具を揃えよう',
-    link: '/about',
-  },
-  {
-    image: '/Design-sho-do/img/banners/nc-block02.png',
-    text: '初心者におすすめの筆',
-    link: '/about',
-  },
-  {
-    image: '/Design-sho-do/img/banners/nc-block03.png',
-    text: '墨と硯の選び方',
-    link: '/about',
-  },
-  {
-    image: '/Design-sho-do/img/banners/nc-block04.png',
-    text: '書道を始めてみませんか？',
-    link: '/about',
-  },
-]
-
-interface AffiliateBannerProps {
-  sid?: string
-  section?: string
+// グローバル型定義
+declare global {
+  interface Window {
+    NeuvecomAffiliateBanner: new (config: AffiliateBannerConfig) => AffiliateBannerInstance
+  }
 }
 
-export function AffiliateBanner({ sid: _sid, section: _section }: AffiliateBannerProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
+interface AffiliateBannerConfig {
+  sid: string
+  configPath?: string
+  storageKeyPrefix?: string
+  fallbackImagesPath?: string
+}
+
+interface AffiliateBannerInstance {
+  render: (container: HTMLElement, section?: string) => void
+  destroy: () => void
+}
+
+interface AffiliateBannerProps {
+  sid: string
+  section?: string
+  configPath?: string
+  storageKeyPrefix?: string
+  fallbackImagesPath?: string
+}
+
+export function AffiliateBanner({
+  sid,
+  section = 'header',
+  configPath = '/Design-sho-do/data/affiliates.yaml',
+  storageKeyPrefix = 'design-shodo',
+  fallbackImagesPath = '/Design-sho-do/img/banners/',
+}: AffiliateBannerProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const bannerRef = useRef<AffiliateBannerInstance | null>(null)
 
   useEffect(() => {
-    // ランダムな初期インデックス
-    setCurrentIndex(Math.floor(Math.random() * BANNER_DATA.length))
-  }, [])
+    // affiliate-lite.jsを動的に読み込む
+    const loadScript = async () => {
+      if (!window.NeuvecomAffiliateBanner) {
+        const script = document.createElement('script')
+        script.src = '/Design-sho-do/lib/neuvecom-common/js/affiliate-lite.js'
+        script.async = true
 
-  // 10秒ごとに画像を切り替え
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % BANNER_DATA.length)
-    }, 10000)
-    return () => clearInterval(interval)
-  }, [])
+        await new Promise<void>((resolve, reject) => {
+          script.onload = () => resolve()
+          script.onerror = () => reject(new Error('Failed to load affiliate script'))
+          document.head.appendChild(script)
+        })
+      }
 
-  const currentBanner = BANNER_DATA[currentIndex]
+      if (containerRef.current && window.NeuvecomAffiliateBanner) {
+        bannerRef.current = new window.NeuvecomAffiliateBanner({
+          sid,
+          configPath,
+          storageKeyPrefix,
+          fallbackImagesPath,
+        })
+        bannerRef.current.render(containerRef.current, section)
+      }
+    }
 
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <a href={currentBanner.link} className="block">
-        <img
-          src={currentBanner.image}
-          alt={currentBanner.text}
-          className="max-w-full h-auto rounded transition-opacity duration-500 hover:opacity-80"
-          style={{ maxHeight: '60px' }}
-        />
-      </a>
-      <p className="text-xs text-stone-500">{currentBanner.text}</p>
-    </div>
-  )
+    loadScript().catch(console.error)
+
+    return () => {
+      if (bannerRef.current) {
+        bannerRef.current.destroy()
+        bannerRef.current = null
+      }
+    }
+  }, [sid, section, configPath, storageKeyPrefix, fallbackImagesPath])
+
+  return <div ref={containerRef} className="affiliate-banner-area" />
 }
