@@ -31,9 +31,9 @@ interface AffiliateBannerProps {
 export function AffiliateBanner({
   sid,
   section = 'header',
-  configPath = '/Design-sho-do/data/affiliates.yaml',
+  configPath = '/data/affiliates.yaml',
   storageKeyPrefix = 'design-shodo',
-  fallbackImagesPath = '/Design-sho-do/img/banners/',
+  fallbackImagesPath = '/img/banners/',
 }: AffiliateBannerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const bannerRef = useRef<AffiliateBannerInstance | null>(null)
