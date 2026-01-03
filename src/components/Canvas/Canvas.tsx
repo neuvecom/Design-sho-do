@@ -15,6 +15,7 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
   const rendererRef = useRef<CanvasRenderer | null>(null)
   const brushEngineRef = useRef<BrushEngine | null>(null)
   const isDrawingRef = useRef(false)
+  const isShiftDrawingRef = useRef(false) // Shift+マウス移動描画モード
   const [isReady, setIsReady] = useState(false)
 
   const { brushSize, brushColor, brushType, canvasSize, strokes, addStroke, showGrid } = useCanvasStore()
@@ -75,6 +76,20 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.key === 'Shift') {
         setIsShiftPressed(false)
+        // Shift描画モード中にShiftを離したらストローク終了
+        if (isShiftDrawingRef.current) {
+          const engine = brushEngineRef.current
+          const renderer = rendererRef.current
+          if (engine && renderer?.isInitialized) {
+            const stroke = engine.endStroke()
+            if (stroke) {
+              renderer.commitStroke()
+              addStroke(stroke)
+            }
+          }
+          isDrawingRef.current = false
+          isShiftDrawingRef.current = false
+        }
       }
     }
 
@@ -85,7 +100,7 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [])
+  }, [addStroke])
 
   // 外部にレンダラーを公開
   useImperativeHandle(ref, () => ({
@@ -158,13 +173,25 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
 
   // ストローク継続
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isReady || !isDrawingRef.current) return
-
-    e.preventDefault()
+    if (!isReady) return
 
     const engine = brushEngineRef.current
     const renderer = rendererRef.current
     if (!engine || !renderer?.isInitialized) return
+
+    // Shift+マウス移動モード: Shiftが押されていて、まだ描画開始していなければ開始
+    if (e.shiftKey && !isDrawingRef.current && !isShiftDrawingRef.current) {
+      e.preventDefault()
+      isShiftDrawingRef.current = true
+      isDrawingRef.current = true
+      const point = createBrushPoint(e)
+      engine.startStroke(point)
+      return
+    }
+
+    if (!isDrawingRef.current) return
+
+    e.preventDefault()
 
     const point = createBrushPoint(e)
     const points = engine.continueStroke(point)
@@ -180,6 +207,7 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
     e.preventDefault()
     e.currentTarget.releasePointerCapture(e.pointerId)
     isDrawingRef.current = false
+    isShiftDrawingRef.current = false
 
     const engine = brushEngineRef.current
     const renderer = rendererRef.current
