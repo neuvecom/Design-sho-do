@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#faf9f7"/>
+      <stop offset="100%" style="stop-color:#f5f3ef"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- 和紙テクスチャ風の装飾線 -->
+  <line x1="60" y1="60" x2="1140" y2="60" stroke="#d6d3d1" stroke-width="1"/>
+  <line x1="60" y1="570" x2="1140" y2="570" stroke="#d6d3d1" stroke-width="1"/>
+  <line x1="60" y1="60" x2="60" y2="570" stroke="#d6d3d1" stroke-width="1"/>
+  <line x1="1140" y1="60" x2="1140" y2="570" stroke="#d6d3d1" stroke-width="1"/>
+
+  <!-- メイン「書」の文字 -->
+  <text x="400" y="380" font-family="serif" font-size="280" fill="#292524" font-weight="bold">書</text>
+
+  <!-- タイトル -->
+  <text x="620" y="280" font-family="'Noto Sans JP', sans-serif" font-size="72" fill="#44403c" font-weight="500">デザイン書道</text>
+
+  <!-- サブタイトル -->
+  <text x="620" y="360" font-family="'Noto Sans JP', sans-serif" font-size="32" fill="#78716c">Webで手軽に楽しむ書道アプリ</text>
+
+  <!-- URL -->
+  <text x="620" y="450" font-family="'Noto Sans JP', sans-serif" font-size="24" fill="#a8a29e">neuvecom.github.io/Design-sho-do</text>
+</svg>
