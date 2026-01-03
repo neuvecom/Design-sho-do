@@ -1,4 +1,5 @@
 export { Toolbar } from './Toolbar'
+export { ToolbarOverlay } from './ToolbarOverlay'
 export { BrushSettings } from './BrushSettings'
 export { ColorPicker } from './ColorPicker'
 export { ActionButtons } from './ActionButtons'

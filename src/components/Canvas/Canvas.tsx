@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useState } from 'react'
+import { useEffect, useRef, forwardRef, useImperativeHandle, useMemo, useState, useCallback } from 'react'
 import { CanvasRenderer } from './CanvasRenderer'
 import { BrushEngine } from '../../core/brush'
 import { useCanvasStore } from '../../stores/canvasStore'
@@ -10,6 +10,28 @@ export interface CanvasHandle {
   getRenderer: () => CanvasRenderer | null
 }
 
+// ビューポートに収まるようスケール計算するフック
+function useCanvasScale(canvasHeight: number) {
+  const [scale, setScale] = useState(1)
+
+  const calculateScale = useCallback(() => {
+    const viewportHeight = window.innerHeight
+    // ヘッダー + アクションバー + フッター + 余白
+    const reservedHeight = 280
+    const availableHeight = viewportHeight - reservedHeight
+    const newScale = Math.min(1, Math.max(0.4, availableHeight / canvasHeight))
+    setScale(newScale)
+  }, [canvasHeight])
+
+  useEffect(() => {
+    calculateScale()
+    window.addEventListener('resize', calculateScale)
+    return () => window.removeEventListener('resize', calculateScale)
+  }, [calculateScale])
+
+  return scale
+}
+
 export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
   const containerRef = useRef<HTMLDivElement>(null)
   const rendererRef = useRef<CanvasRenderer | null>(null)
@@ -19,6 +41,9 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
   const [isReady, setIsReady] = useState(false)
 
   const { brushSize, brushColor, brushType, canvasSize, strokes, addStroke, showGrid } = useCanvasStore()
+
+  // ビューポートに応じたスケール
+  const scale = useCanvasScale(canvasSize.height)
   const { isTemplateMode, templateImage, templateChar, templateOpacity } = useTemplateStore()
   const [isShiftPressed, setIsShiftPressed] = useState(false)
 
@@ -146,11 +171,12 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
     renderer.renderAllStrokes(strokes)
   }, [strokes])
 
-  // ポインタイベントからBrushPointを生成
+  // ポインタイベントからBrushPointを生成（スケール補正付き）
   const createBrushPoint = (e: React.PointerEvent): BrushPoint => {
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
+    // スケール補正: 表示サイズから実際のキャンバス座標に変換
+    const x = (e.clientX - rect.left) / scale
+    const y = (e.clientY - rect.top) / scale
     const pressure = e.pointerType === 'mouse' ? 0.5 : e.pressure || 0.5
 
     return { x, y, pressure, timestamp: e.timeStamp }
@@ -229,6 +255,8 @@ export const Canvas = forwardRef<CanvasHandle>(function Canvas(_, ref) {
         height: canvasSize.height,
         cursor: cursorStyle,
         touchAction: 'none',
+        transform: `scale(${scale})`,
+        transformOrigin: 'top center',
       }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

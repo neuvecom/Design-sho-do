@@ -52,6 +52,16 @@ const GridIcon = () => (
   </svg>
 )
 
+const PaletteIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.4-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4c3.1 0 5.6-2.5 5.6-5.6C22 5.9 17.5 2 12 2z" />
+    <circle cx="7.5" cy="11.5" r="1.5" fill="currentColor" />
+    <circle cx="10.5" cy="7.5" r="1.5" fill="currentColor" />
+    <circle cx="14.5" cy="7.5" r="1.5" fill="currentColor" />
+    <circle cx="17.5" cy="11.5" r="1.5" fill="currentColor" />
+  </svg>
+)
+
 interface ToastState {
   message: string
   type: 'success' | 'error' | 'info'
@@ -59,9 +69,10 @@ interface ToastState {
 
 interface ActionButtonsProps {
   canvasRef?: React.RefObject<CanvasHandle | null>
+  onToggleToolbar?: () => void
 }
 
-export function ActionButtons({ canvasRef }: ActionButtonsProps) {
+export function ActionButtons({ canvasRef, onToggleToolbar }: ActionButtonsProps) {
   const { undo, redo, clearCanvas, history, historyIndex, showGrid, toggleGrid } = useCanvasStore()
   const [toast, setToast] = useState<ToastState | null>(null)
 
@@ -130,6 +141,20 @@ export function ActionButtons({ canvasRef }: ActionButtonsProps) {
   return (
     <>
       <div className="flex gap-1">
+        {/* ツール設定ボタン */}
+        {onToggleToolbar && (
+          <>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleToolbar}
+              title="ツール設定"
+            >
+              <PaletteIcon />
+            </Button>
+            <div className="w-px h-5 bg-stone-200 mx-1" />
+          </>
+        )}
         <Button
           variant="ghost"
           size="sm"
