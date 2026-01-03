@@ -10,6 +10,8 @@ interface UsePointerInputProps {
 export function usePointerInput({ onStart, onMove, onEnd }: UsePointerInputProps) {
   const isDrawingRef = useRef(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const isShiftDrawingRef = useRef(false) // Shift+マウス移動描画モード
+  const lastPointerEventRef = useRef<PointerEvent | null>(null) // 最後のポインタイベントを保持
 
   // ポインタイベントからBrushPointを生成
   const createBrushPoint = useCallback((e: PointerEvent): BrushPoint | null => {
@@ -48,13 +50,26 @@ export function usePointerInput({ onStart, onMove, onEnd }: UsePointerInputProps
 
   const handlePointerMove = useCallback(
     (e: PointerEvent) => {
+      // 最後のポインタイベントを保存（Shiftキー処理用）
+      lastPointerEventRef.current = e
+
+      // Shift+マウス移動モード: Shiftが押されていて、まだ描画開始していなければ開始
+      if (e.shiftKey && !isDrawingRef.current && !isShiftDrawingRef.current) {
+        e.preventDefault()
+        isShiftDrawingRef.current = true
+        isDrawingRef.current = true
+        const point = createBrushPoint(e)
+        if (point) onStart(point)
+        return
+      }
+
       if (!isDrawingRef.current) return
       e.preventDefault()
 
       const point = createBrushPoint(e)
       if (point) onMove(point)
     },
-    [createBrushPoint, onMove]
+    [createBrushPoint, onMove, onStart]
   )
 
   const handlePointerUp = useCallback(
@@ -63,6 +78,7 @@ export function usePointerInput({ onStart, onMove, onEnd }: UsePointerInputProps
       e.preventDefault()
 
       isDrawingRef.current = false
+      isShiftDrawingRef.current = false
 
       // ポインタキャプチャを解放
       const target = e.target as HTMLElement
@@ -77,11 +93,24 @@ export function usePointerInput({ onStart, onMove, onEnd }: UsePointerInputProps
     (e: PointerEvent) => {
       if (!isDrawingRef.current) return
       isDrawingRef.current = false
+      isShiftDrawingRef.current = false
 
       const target = e.target as HTMLElement
       target.releasePointerCapture(e.pointerId)
 
       onEnd()
+    },
+    [onEnd]
+  )
+
+  // Shiftキーを離したときに描画を終了するハンドラ
+  const handleKeyUp = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Shift' && isShiftDrawingRef.current) {
+        isDrawingRef.current = false
+        isShiftDrawingRef.current = false
+        onEnd()
+      }
     },
     [onEnd]
   )
@@ -97,6 +126,9 @@ export function usePointerInput({ onStart, onMove, onEnd }: UsePointerInputProps
       container.addEventListener('pointerup', handlePointerUp)
       container.addEventListener('pointercancel', handlePointerCancel)
 
+      // Shift+マウス移動描画モード用: keyupはwindowで監視
+      window.addEventListener('keyup', handleKeyUp)
+
       // タッチデバイスでのスクロール防止
       container.style.touchAction = 'none'
 
@@ -105,9 +137,10 @@ export function usePointerInput({ onStart, onMove, onEnd }: UsePointerInputProps
         container.removeEventListener('pointermove', handlePointerMove)
         container.removeEventListener('pointerup', handlePointerUp)
         container.removeEventListener('pointercancel', handlePointerCancel)
+        window.removeEventListener('keyup', handleKeyUp)
       }
     },
-    [handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel]
+    [handlePointerDown, handlePointerMove, handlePointerUp, handlePointerCancel, handleKeyUp]
   )
 
   return { attachListeners, containerRef }

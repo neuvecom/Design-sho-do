@@ -2,6 +2,8 @@
 
 Webでデザイン書道を手軽に楽しめるアプリケーションです。
 
+https://neuve.com/Design-sho-do/
+
 ## 機能
 
 - 筆圧対応のリアルな筆運び（Apple Pencil、Surface Pen、Wacom等対応）
