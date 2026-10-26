@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { AffiliateBanner } from '../Affiliate'
+import { KofiBanner } from '../Kofi'
 
 export function Footer() {
   return (
@@ -32,9 +32,9 @@ export function Footer() {
         </Link>
       </nav>
 
-      {/* バリューコマース広告バナー */}
+      {/* Ko-fi 支援バナー */}
       <div className="w-full max-w-xl">
-        <AffiliateBanner sid="3757792" section="header" />
+        <KofiBanner />
       </div>
 
       {/* 著作権表示 */}
