@@ -1,0 +1,1 @@
+export { KofiBanner } from './KofiBanner'

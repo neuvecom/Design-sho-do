@@ -1,3 +1,0 @@
-[submodule "src/lib/neuvecom-common"]
-	path = src/lib/neuvecom-common
-	url = git@github.com:neuvecom/neuvecom-common.git
